@@ -40,8 +40,6 @@ export const streamChat = httpAction(async (ctx, request) => {
       model = openRouter(modelConfig.modelId);
       break;
     case "google":
-      // For Google, ensure that useSearchGrounding is only set if search is true.
-      // If imageGeneration is true, you'll configure responseModalities later.
       const google = createGoogleGenerativeAI({ apiKey: key });
       model = google(
         modelConfig.modelId,
@@ -90,67 +88,25 @@ export const streamChat = httpAction(async (ctx, request) => {
     request,
     body.streamId as StreamId,
     async (ctx, _request, _streamId, append) => {
-      let googleProviderOptions: {
-        responseModalities?: ("TEXT" | "IMAGE")[];
-      } = {};
-
       if (imageGeneration) {
-        googleProviderOptions.responseModalities = ["TEXT", "IMAGE"];
-      }
-      console.log("Google Provider Options:", googleProviderOptions);
+        const result = await generateText({
+          model: model,
+          providerOptions: {
+            google: { responseModalities: ["TEXT", "IMAGE"] },
+          },
+          messages: history,
+        });
 
-      const result = streamText({
-        model,
-        system: `
-        You are an ai assistant that can answer questions and help with tasks.
-        Be as helpful as you can and provide really relevant information.
-        You are continuing a conversation. The conversation history is JSON-formatted.
-        Provide your response in markdown format.
-        When generating images, just mention that you are generating them.
-    `,
-        messages: history,
-        providerOptions: {
-          google: googleProviderOptions,
-        },
-      });
+        await append(result.text);
 
-      // 1. Stream the text content first
-      for await (const textPart of result.textStream) {
-        await append(textPart);
-      }
-
-      // 2. After text streaming is complete, handle search sources if applicable
-      if (search) {
-        // Wait for sources if search is enabled.
-        const sources = await result.sources;
-        if (sources && sources.length > 0) {
-          await append("\n");
-          await append("**Sources**");
-          for (const source of sources) {
-            await append(`\n- [${source.title}](${source.url})`); // Unordered list item with a link
-          }
-        }
-      }
-
-      // 3. After text and sources (if any) are streamed, handle image generation
-      if (imageGeneration) {
-        console.log("Initiating image generation processing...");
-        // Wait for all files to be generated. This will block until images are ready.
-        const generations = await result.files;
-        console.log(`Found ${generations.length} file(s).`);
-
-        for (const file of generations) {
+        for (const file of result.files) {
           if (file.mimeType.startsWith("image/")) {
             try {
               const postUrl = await ctx.storage.generateUploadUrl();
               const uploadResult = await fetch(postUrl, {
                 method: "POST",
                 headers: { "Content-Type": file.mimeType },
-                // Make sure file.base64 is properly decoded if it's a base64 string
-                // The AI SDK's `file.base64` is typically a `Uint8Array` or `Buffer`
-                // which `fetch` can handle directly. If it's a base64 string, you'd need:
-                // body: Buffer.from(file.base64, 'base64') or similar.
-                body: file.base64,
+                body: file.uint8Array,
               });
 
               if (!uploadResult.ok) {
@@ -162,7 +118,7 @@ export const streamChat = httpAction(async (ctx, request) => {
                 await append(
                   `\nError uploading image: ${uploadResult.statusText}`,
                 );
-                continue; // Skip to next file if upload failed
+                continue;
               }
               const data = await uploadResult.json();
               const storageId = data.storageId;
@@ -191,7 +147,38 @@ export const streamChat = httpAction(async (ctx, request) => {
             }
           }
         }
+      } else {
+        const result = streamText({
+          model,
+          system: `
+              You are an ai assistant that can answer questions and help with tasks.
+              Be as helpful as you can and provide really relevant information.
+              You are continuing a conversation. The conversation history is JSON-formatted.
+              Provide your response in markdown format.
+              When generating images, just mention that you are generating them.
+          `,
+          messages: history,
+        });
+
+        // 1. Stream the text content first
+        for await (const textPart of result.textStream) {
+          await append(textPart);
+        }
+
+        // 2. After text streaming is complete, handle search sources if applicable
+        if (search) {
+          // Wait for sources if search is enabled.
+          const sources = await result.sources;
+          if (sources && sources.length > 0) {
+            await append("\n");
+            await append("**Sources**");
+            for (const source of sources) {
+              await append(`\n- [${source.title}](${source.url})`); // Unordered list item with a link
+            }
+          }
+        }
       }
+
       console.log("Streaming complete.");
     },
   );

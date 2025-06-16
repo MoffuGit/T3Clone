@@ -63,7 +63,7 @@ export function ModelMessage({
           ref={messageRef}
           className="flex max-w-full min-w-0 flex-col items-start"
         >
-          <MemoizedMarkdown content={text} id={message._id} />
+          <MemoizedMarkdown content={text} />
           {status === "pending" && (
             <div className="mt-2 flex animate-pulse items-center justify-center space-x-1.5">
               <div className="bg-accent h-3 w-3 rounded-full" />
