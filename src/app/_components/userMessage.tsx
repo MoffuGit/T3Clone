@@ -7,7 +7,7 @@ export function UserMessage({ message }: { message: Doc<"messages"> }) {
     <div className="flex w-full justify-end">
       <div className="flex w-full flex-row-reverse items-start gap-2 px-4 py-2">
         <div className="flex w-full flex-col items-end">
-          <div className="bg-accent text-accent-foreground max-w-[80%] rounded-lg px-4 py-3 break-words shadow-md">
+          <div className="bg-accent text-accent-foreground max-w-[80%] rounded-lg px-4 py-3 break-words">
             {message.prompt}
           </div>
           {message.attachments && (

@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
   type Dispatch,
-  type RefObject,
 } from "react";
 import { api } from "../../../convex/_generated/api";
 import { type Id } from "../../../convex/_generated/dataModel";
@@ -126,50 +125,13 @@ export function ChatInput({
 
   const params = useParams<{ slug: string }>();
 
-  // Effect to focus input when thread changes (e.g., new thread page)
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
   }, [params, textareaRef]);
 
-  // State and logic for the scroll-to-bottom button
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const { scrollRef } = stickToBottomInstance;
-
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current) return;
-
-    const scrollableDiv = scrollRef.current;
-    const tolerance = 80; // Pixels from the bottom to hide the button
-
-    setShowScrollButton(
-      scrollableDiv.scrollTop + scrollableDiv.clientHeight <
-        scrollableDiv.scrollHeight - tolerance,
-    );
-  }, [scrollRef]);
-
-  useEffect(() => {
-    const scrollableDiv = scrollRef.current;
-
-    if (!scrollableDiv) {
-      return;
-    }
-
-    scrollableDiv.addEventListener("scroll", handleScroll);
-    handleScroll(); // Check initial state
-
-    return () => {
-      scrollableDiv.removeEventListener("scroll", handleScroll);
-    };
-  }, [scrollRef, handleScroll]);
-
-  const scrollToBottom = useCallback(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [scrollRef]);
+  const { scrollToBottom } = stickToBottomInstance;
 
   // Main submit logic remains here as it orchestrates mutations and state updates
   const handleSubmit = useCallback(async () => {
@@ -224,7 +186,6 @@ export function ChatInput({
 
     setSelectedFiles([]);
 
-    // 2. Send the message immediately
     const chatId = await sendMessage({
       prompt: input.prompt,
       thread: threadId,
@@ -251,7 +212,7 @@ export function ChatInput({
 
     addDrivenId(chatId);
 
-    adjustHeight(true); // Reset textarea height
+    adjustHeight(true);
     setIsStreaming(true);
     void (async () => {
       const breakPointId = await createBreakPoint({
@@ -261,6 +222,8 @@ export function ChatInput({
       });
       addDrivenId(breakPointId);
     })();
+
+    await scrollToBottom();
 
     if (isNewThread) {
       router.push(`/${threadId}`);
@@ -273,12 +236,10 @@ export function ChatInput({
     adjustHeight,
     setIsStreaming,
     thread,
-    scrollRef,
     createNewThread,
     sendMessage,
     createBreakPoint,
     addDrivenId,
-    scrollRef,
     router,
     searchGrounding,
     selectedFiles,
@@ -296,10 +257,7 @@ export function ChatInput({
   return (
     <div className="pointer-events-none absolute bottom-0 z-10 w-full px-2">
       <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center">
-        <ScrollToBottomButton
-          show={showScrollButton}
-          onClick={scrollToBottom}
-        />
+        <ScrollToBottomButton stickToBottomInstance={stickToBottomInstance} />
 
         <form
           onSubmit={async (e) => {
@@ -360,21 +318,19 @@ export function ChatInput({
 import { ArrowDown, PaperclipIcon } from "lucide-react";
 
 interface ScrollToBottomButtonProps {
-  show: boolean;
-  onClick: () => void;
+  stickToBottomInstance: StickToBottomInstance;
 }
 
 export function ScrollToBottomButton({
-  show,
-  onClick,
+  stickToBottomInstance,
 }: ScrollToBottomButtonProps) {
-  if (!show) {
-    return null; // Don't render if not needed
+  if (stickToBottomInstance.isNearBottom) {
+    return;
   }
 
   return (
     <button
-      onClick={onClick}
+      onClick={async () => stickToBottomInstance.scrollToBottom()}
       className="hover:bg-primary/20 pointer-events-auto mb-4 cursor-pointer gap-0 rounded-full p-2 shadow backdrop-blur-md disabled:cursor-not-allowed disabled:bg-transparent"
       aria-label="Scroll to bottom"
     >
