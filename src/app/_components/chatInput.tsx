@@ -92,12 +92,12 @@ export function ChatInput({
   isStreaming,
   setIsStreaming,
   thread,
-  scrollRef,
+  stickToBottomInstance,
 }: {
   isStreaming: boolean;
   setIsStreaming: Dispatch<React.SetStateAction<boolean>>;
   thread: Id<"threads"> | null | undefined;
-  scrollRef: RefObject<HTMLDivElement | null>;
+  stickToBottomInstance: StickToBottomInstance;
 }) {
   const { input, handleInputChange, resetInput } = useChatInputForm();
   const {
@@ -135,6 +135,7 @@ export function ChatInput({
 
   // State and logic for the scroll-to-bottom button
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const { scrollRef } = stickToBottomInstance;
 
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
@@ -263,15 +264,6 @@ export function ChatInput({
 
     if (isNewThread) {
       router.push(`/${threadId}`);
-      scrollRef.current?.scrollTo({
-        top: scrollRef.current?.scrollHeight,
-        behavior: "smooth",
-      });
-    } else {
-      scrollRef.current?.scrollTo({
-        top: scrollRef.current?.scrollHeight,
-        behavior: "smooth",
-      });
     }
   }, [
     input,
@@ -286,6 +278,7 @@ export function ChatInput({
     sendMessage,
     createBreakPoint,
     addDrivenId,
+    scrollRef,
     router,
     searchGrounding,
     selectedFiles,
@@ -389,7 +382,7 @@ export function ScrollToBottomButton({
     </button>
   );
 }
-import { ChevronUp, File, Globe, Image, X } from "lucide-react";
+import { ChevronUp, Globe, Image, X } from "lucide-react";
 
 import { Send } from "lucide-react";
 
@@ -420,7 +413,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { AI_MODELS, MODEL_CONFIGS, type AIModel } from "~/lib/llmProviders"; // Assuming AI_MODELS is needed here
-import { generateUploadUrl } from "convex/messages";
+import type { StickToBottomInstance } from "use-stick-to-bottom";
 
 interface ChatBottomBarProps {
   input: {

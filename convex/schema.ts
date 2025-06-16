@@ -19,12 +19,13 @@ export default defineSchema({
     }),
   messages: defineTable({
     prompt: v.string(),
+    response: v.optional(v.string()),
     thread: v.id("threads"),
     model: v.string(),
     attachments: v.optional(v.array(v.id("_storage"))),
     searchGrounding: v.boolean(),
     imageGeneration: v.boolean(),
-    responseStreamId: StreamIdValidator,
+    responseStreamId: v.optional(StreamIdValidator),
   })
     .index("by_stream", ["responseStreamId"])
     .index("by_thread", ["thread"])

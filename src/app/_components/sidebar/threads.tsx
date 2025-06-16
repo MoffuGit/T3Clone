@@ -11,15 +11,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { api } from "convex/_generated/api";
@@ -28,7 +25,7 @@ import { Settings } from "lucide-react";
 import { UserKeysModal } from "../keys/keys";
 import { SidebarLeftHeader } from "./sideBarLeftHeader";
 import { ThreadList } from "./threadList";
-import { SignedOut, SignOutButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 import { useAPIKeyStore } from "~/stores/userKeys";
 
 export function ThreadsSideBar() {

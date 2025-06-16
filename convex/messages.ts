@@ -4,7 +4,10 @@ import {
   internalQuery,
   internalMutation,
 } from "./_generated/server";
-import { type StreamId } from "@convex-dev/persistent-text-streaming";
+import {
+  StreamIdValidator,
+  type StreamId,
+} from "@convex-dev/persistent-text-streaming";
 import { v } from "convex/values";
 import { streamingComponent } from "./streaming";
 
@@ -90,6 +93,25 @@ export const addAttachments = mutation({
     }
   },
 });
+
+export const setResponse = mutation({
+  args: {
+    streamId: StreamIdValidator,
+    response: v.string(),
+  },
+  handler: async (ctx, { streamId, response }) => {
+    const message = await ctx.db
+      .query("messages")
+      .withIndex("by_stream", (q) => q.eq("responseStreamId", streamId))
+      .unique();
+    if (message) {
+      ctx.db.patch(message._id, {
+        response: response,
+        responseStreamId: undefined,
+      });
+    }
+  },
+});
 export const getHistory = internalQuery({
   args: { thread: v.id("threads") },
   handler: async (ctx, args) => {
@@ -128,10 +150,17 @@ export const getHistory = internalQuery({
               return null;
             }),
           ),
-          responseMessage: await streamingComponent.getStreamBody(
-            ctx,
-            userMessage.responseStreamId as StreamId,
-          ),
+          responseMessage:
+            userMessage.response !== undefined
+              ? userMessage.response
+              : userMessage.responseStreamId !== undefined
+                ? (
+                    await streamingComponent.getStreamBody(
+                      ctx,
+                      userMessage.responseStreamId as StreamId,
+                    )
+                  ).text
+                : "",
         };
       }),
     );
@@ -166,7 +195,7 @@ export const getHistory = internalQuery({
 
       const assistant = {
         role: "assistant" as const,
-        content: joined.responseMessage.text,
+        content: joined.responseMessage,
       };
 
       // If the assistant message is empty, its probably because we have not
