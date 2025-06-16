@@ -23,14 +23,7 @@ export function ChatWindow({
 
   return (
     <div className="absolute top-0 bottom-0 w-full">
-      {thread !== undefined ? (
-        <Messages
-          thread={thread}
-          registerRef={registerRef}
-          stickToBottomInstance={stickToBottomInstance}
-          setIsStreaming={setIsStreaming}
-        />
-      ) : (
+      {thread === null ? (
         <div
           className="absolute inset-0 mt-16 overflow-y-scroll pt-2 pb-52"
           style={{
@@ -45,6 +38,13 @@ export function ChatWindow({
             </div>
           </div>
         </div>
+      ) : (
+        <Messages
+          thread={thread}
+          registerRef={registerRef}
+          stickToBottomInstance={stickToBottomInstance}
+          setIsStreaming={setIsStreaming}
+        />
       )}
 
       <ChatInput

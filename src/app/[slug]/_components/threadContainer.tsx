@@ -21,9 +21,11 @@ interface ThreadContainerProps {
 }
 
 export function TheadContainer({ children, slug }: ThreadContainerProps) {
-  const thread = useQuery(api.threads.getThread, {
-    threadId: slug ? (slug as Id<"threads">) : undefined,
-  });
+  const thread = slug
+    ? useQuery(api.threads.getThread, {
+        threadId: slug as Id<"threads">,
+      })
+    : null;
   let [right, set_right] = useState(false);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const stickToBottomInstance = useStickToBottom();
