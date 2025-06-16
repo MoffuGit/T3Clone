@@ -6,7 +6,7 @@ import { streamingComponent } from "./streaming";
 import type { Id } from "./_generated/dataModel";
 import { MODEL_CONFIGS, type AIModel } from "~/lib/llmProviders";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { api } from "./_generated/api";
 
 export const streamChat = httpAction(async (ctx, request) => {
@@ -55,6 +55,8 @@ export const streamChat = httpAction(async (ctx, request) => {
     streamId: string;
   };
 
+  let fullResponseContent = "";
+
   const history = await ctx.runQuery(internal.messages.getHistory, {
     thread: threadId as Id<"threads">,
   });
@@ -88,6 +90,10 @@ export const streamChat = httpAction(async (ctx, request) => {
     request,
     body.streamId as StreamId,
     async (ctx, _request, _streamId, append) => {
+      const appendAndAccumulate = async (text: string) => {
+        await append(text);
+        fullResponseContent = fullResponseContent.concat(text);
+      };
       if (imageGeneration) {
         const result = await generateText({
           model: model,
@@ -97,7 +103,7 @@ export const streamChat = httpAction(async (ctx, request) => {
           messages: history,
         });
 
-        await append(result.text);
+        await appendAndAccumulate(result.text);
 
         for (const file of result.files) {
           if (file.mimeType.startsWith("image/")) {
@@ -115,7 +121,7 @@ export const streamChat = httpAction(async (ctx, request) => {
                   uploadResult.status,
                   uploadResult.statusText,
                 );
-                await append(
+                await appendAndAccumulate(
                   `\nError uploading image: ${uploadResult.statusText}`,
                 );
                 continue;
@@ -128,22 +134,28 @@ export const streamChat = httpAction(async (ctx, request) => {
                   "storageId is missing in the upload response:",
                   data,
                 );
-                await append(`\nError: Could not get storage ID for image.`);
+                await appendAndAccumulate(
+                  `\nError: Could not get storage ID for image.`,
+                );
                 continue;
               }
 
               const url = await ctx.storage.getUrl(storageId as Id<"_storage">);
               if (url) {
-                await append("\n");
-                await append(`![](${url})`);
+                await appendAndAccumulate("\n");
+                await appendAndAccumulate(`![](${url})`);
                 console.log(`Appended image URL: ${url}`);
               } else {
                 console.error("Could not get URL for storageId:", storageId);
-                await append(`\nError: Could not get URL for image.`);
+                await appendAndAccumulate(
+                  `\nError: Could not get URL for image.`,
+                );
               }
             } catch (error) {
               console.error("Error processing image file:", error);
-              await append(`\nAn error occurred while processing an image.`);
+              await appendAndAccumulate(
+                `\nAn error occurred while processing an image.`,
+              );
             }
           }
         }
@@ -162,7 +174,7 @@ export const streamChat = httpAction(async (ctx, request) => {
 
         // 1. Stream the text content first
         for await (const textPart of result.textStream) {
-          await append(textPart);
+          await appendAndAccumulate(textPart);
         }
 
         // 2. After text streaming is complete, handle search sources if applicable
@@ -170,16 +182,21 @@ export const streamChat = httpAction(async (ctx, request) => {
           // Wait for sources if search is enabled.
           const sources = await result.sources;
           if (sources && sources.length > 0) {
-            await append("\n");
-            await append("**Sources**");
+            await appendAndAccumulate("\n");
+            await appendAndAccumulate("**Sources**");
             for (const source of sources) {
-              await append(`\n- [${source.title}](${source.url})`); // Unordered list item with a link
+              await appendAndAccumulate(`\n- [${source.title}](${source.url})`); // Unordered list item with a link
             }
           }
         }
       }
 
       console.log("Streaming complete.");
+
+      await ctx.runMutation(api.messages.setResponse, {
+        streamId: body.streamId as StreamId,
+        response: fullResponseContent,
+      });
     },
   );
 
@@ -188,6 +205,7 @@ export const streamChat = httpAction(async (ctx, request) => {
 
   return response;
 });
+
 export const streamBreakpoint = httpAction(async (ctx, request) => {
   const messageHeader = request.headers.get("X-Message-Id");
   const modelHeader = request.headers.get("X-Model");

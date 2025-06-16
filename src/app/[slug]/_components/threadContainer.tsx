@@ -1,13 +1,11 @@
 import type { Id } from "convex/_generated/dataModel";
+import {
+  useStickToBottom,
+  type StickToBottomInstance,
+} from "use-stick-to-bottom";
 import { SidebarInset } from "~/components/ui/sidebar";
 
-import {
-  useCallback,
-  useRef,
-  useState,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import { ChatHeader } from "./header";
 import { SideBar } from "./sidebar";
 import { useQuery } from "convex/react";
@@ -18,7 +16,7 @@ interface ThreadContainerProps {
   children: (chatProps: {
     thread: Id<"threads"> | undefined | null;
     registerRef: (id: string, ref: HTMLDivElement | null) => void;
-    scrollRef: RefObject<HTMLDivElement | null>;
+    stickToBottomInstance: StickToBottomInstance;
   }) => ReactNode;
 }
 
@@ -28,7 +26,7 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
   });
   let [right, set_right] = useState(false);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickToBottomInstance = useStickToBottom();
   const scrollToMessage = useCallback(
     (id: string, options: ScrollIntoViewOptions) => {
       const ref = messageRefs.current[id];
@@ -41,6 +39,7 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
   const registerRef = useCallback((id: string, ref: HTMLDivElement | null) => {
     messageRefs.current[id] = ref;
   }, []);
+  const { scrollRef } = stickToBottomInstance;
   const scrollTo = useCallback(
     (side: "top" | "bottom", behavior: ScrollBehavior) => {
       if (scrollRef.current) {
@@ -70,7 +69,7 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
         <div className="flex h-max max-h-screen flex-col">
           <ChatHeader thread={thread} toggleSidebar={toggleSidebar} />
           {children({
-            scrollRef: scrollRef,
+            stickToBottomInstance,
             thread: thread?._id,
             registerRef: registerRef,
           })}

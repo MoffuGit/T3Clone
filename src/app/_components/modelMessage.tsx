@@ -1,3 +1,4 @@
+"use client";
 import type { Doc } from "convex/_generated/dataModel";
 import { MemoizedMarkdown } from "./markdown/markdown";
 import { useRef, useState } from "react";
@@ -27,6 +28,10 @@ export function ModelMessage({
   const messageRef = useRef<HTMLDivElement>(null);
   const branchThread = useMutation(api.threads.branchThread);
   const router = useRouter();
+
+  const contentToDisplay =
+    message.response !== undefined ? message.response : text;
+
   const copyToClipboard = async () => {
     try {
       if (messageRef !== null) {
@@ -42,6 +47,7 @@ export function ModelMessage({
       console.error("Failed to copy code to clipboard:", error);
     }
   };
+
   const onClick = async () => {
     try {
       const newBranch = await branchThread({
@@ -53,6 +59,7 @@ export function ModelMessage({
       console.error("Failed to branch:", error);
     }
   };
+
   return (
     <div className="flex w-full">
       <div
@@ -63,15 +70,15 @@ export function ModelMessage({
           ref={messageRef}
           className="flex max-w-full min-w-0 flex-col items-start"
         >
-          <MemoizedMarkdown content={text} />
-          {status === "pending" && (
+          <MemoizedMarkdown content={contentToDisplay} />
+          {message.response === undefined && status === "pending" && (
             <div className="mt-2 flex animate-pulse items-center justify-center space-x-1.5">
               <div className="bg-accent h-3 w-3 rounded-full" />
               <div className="bg-accent h-3 w-3 rounded-full" />
               <div className="bg-accent h-3 w-3 rounded-full" />
             </div>
           )}
-          {status === "error" && (
+          {message.response === undefined && status === "error" && (
             <div className="mt-2 text-red-500">Error loading response</div>
           )}
         </div>
