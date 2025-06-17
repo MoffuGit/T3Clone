@@ -1,5 +1,5 @@
 "use client";
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "../../../../convex/_generated/dataModel";
 import {
   Sidebar,
   SidebarContent,

@@ -1,4 +1,4 @@
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "../../../../convex/_generated/dataModel";
 import { isToday, isYesterday, isWithinInterval, subDays } from "date-fns";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { GitBranch, Pin, PinOff, Trash2 } from "lucide-react";
 import { useMutation } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { useParams } from "next/navigation";
 import {
   Tooltip,

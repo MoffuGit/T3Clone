@@ -1,5 +1,5 @@
-import { api } from "convex/_generated/api";
-import type { Doc } from "convex/_generated/dataModel";
+import { api } from "../../../../convex/_generated/api";
+import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { GitBranch, PanelRight, Pin, PinOff } from "lucide-react";
 import { useRouter } from "next/navigation";

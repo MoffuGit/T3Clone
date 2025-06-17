@@ -1,4 +1,4 @@
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "../../../../convex/_generated/dataModel";
 import { useEffect } from "react";
 import { ScrollSideBar } from "~/app/_components/sidebar/scroll";
 import { SidebarProvider } from "~/components/ui/sidebar";

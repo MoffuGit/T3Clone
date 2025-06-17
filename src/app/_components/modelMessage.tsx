@@ -1,9 +1,9 @@
 "use client";
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "../../../convex/_generated/dataModel";
 import { MemoizedMarkdown } from "./markdown/markdown";
 import { useRef, useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { GitBranch, Check, Copy } from "lucide-react";
