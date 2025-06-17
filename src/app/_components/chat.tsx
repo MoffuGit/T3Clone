@@ -27,7 +27,7 @@ export function ChatWindow({
             scrollbarGutter: "stable both-edges",
           }}
         >
-          <div className="mx-auto flex w-full max-w-3xl flex-col space-y-12">
+          <div className="mx-auto flex w-full max-w-3xl flex-col-reverse space-y-12">
             <div className="prose prose-neutral dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0 w-full max-w-full">
               <div className="mx-8 mt-46 h-auto w-full">
                 <h2>How can I help you, {user?.firstName?.split(" ")[0]}?</h2>

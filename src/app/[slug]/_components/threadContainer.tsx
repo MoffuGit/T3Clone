@@ -26,7 +26,7 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
   });
   const [right, set_right] = useState(false);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const stickToBottomInstance = useStickToBottom();
+  const stickToBottomInstance = useStickToBottom({ initial: "instant" });
   const scrollToMessage = useCallback(
     (id: string, options: ScrollIntoViewOptions) => {
       const ref = messageRefs.current[id];

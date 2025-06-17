@@ -2,7 +2,7 @@ import { type Id } from "../../../convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import MessageItem from "./message";
 import { api } from "../../../convex/_generated/api";
-import type { RefObject, Dispatch } from "react";
+import type { Dispatch } from "react";
 import { useCallback } from "react";
 import type { StickToBottomInstance } from "use-stick-to-bottom";
 
@@ -22,16 +22,26 @@ export function Messages({
   const messages = useQuery(api.messages.listMessages, { thread });
 
   const renderMessages = useCallback(() => {
-    return messages?.map((message) => (
-      <MessageItem
-        stopStreaming={() => {
-          setIsStreaming(false);
-        }}
-        registerRef={registerRef}
-        key={message._id}
-        message={message}
-      />
-    ));
+    if (!messages) {
+      return null;
+    }
+    return (
+      <div
+        ref={contentRef}
+        className="mx-auto flex w-full max-w-3xl flex-col space-y-12 opacity-100 transition-opacity starting:opacity-0"
+      >
+        {messages.map((message) => (
+          <MessageItem
+            stopStreaming={() => {
+              setIsStreaming(false);
+            }}
+            registerRef={registerRef}
+            key={message._id}
+            message={message}
+          />
+        ))}
+      </div>
+    );
   }, [messages, registerRef, setIsStreaming]);
   const { scrollRef, contentRef } = stickToBottomInstance;
 
@@ -43,12 +53,7 @@ export function Messages({
         scrollbarGutter: "stable both-edges",
       }}
     >
-      <div
-        ref={contentRef}
-        className="mx-auto flex w-full max-w-3xl flex-col space-y-12"
-      >
-        {renderMessages()}
-      </div>
+      {renderMessages()}
     </div>
   );
 }
