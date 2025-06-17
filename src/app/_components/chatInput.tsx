@@ -99,6 +99,7 @@ export function ChatInput({
   stickToBottomInstance: StickToBottomInstance;
 }) {
   const { input, handleInputChange, resetInput } = useChatInputForm();
+  const [isProcessing, setIsProcessing] = useState(false);
   const {
     searchGrounding,
     setSearchGrounding,
@@ -135,9 +136,11 @@ export function ChatInput({
 
   // Main submit logic remains here as it orchestrates mutations and state updates
   const handleSubmit = useCallback(async () => {
-    if (!input.prompt.trim() || isStreaming) {
+    if (!input.prompt.trim() || isStreaming || isProcessing) {
       return;
     }
+
+    setIsProcessing(true);
 
     let threadId: Id<"threads">;
     let isNewThread = false;
@@ -213,6 +216,7 @@ export function ChatInput({
     addDrivenId(chatId);
 
     adjustHeight(true);
+    setIsProcessing(false);
     setIsStreaming(true);
     void (async () => {
       const breakPointId = await createBreakPoint({
@@ -229,12 +233,14 @@ export function ChatInput({
       router.push(`/${threadId}`);
     }
   }, [
+    isProcessing,
     input,
     isStreaming,
     selectedModel,
     resetInput,
     adjustHeight,
     setIsStreaming,
+    setIsProcessing,
     thread,
     createNewThread,
     sendMessage,
@@ -293,6 +299,7 @@ export function ChatInput({
           />
 
           <ChatBottomBar
+            isProcessing={isProcessing}
             selectedFiles={selectedFiles}
             setSelectedFiles={setSelectedFiles}
             imageInputRef={imageInput}
@@ -376,6 +383,7 @@ interface ChatBottomBarProps {
     prompt: string;
   };
   isStreaming: boolean;
+  isProcessing: boolean;
   selectedModel: string;
   searchGrounding: boolean;
   setSearchGrounding: (searchGrounding: boolean) => void;
@@ -389,6 +397,7 @@ interface ChatBottomBarProps {
 
 export function ChatBottomBar({
   input,
+  isProcessing,
   isStreaming,
   selectedModel,
   searchGrounding,
@@ -473,7 +482,9 @@ export function ChatBottomBar({
 
       {/* Render the Send Button */}
       <SendButton
-        disabled={isStreaming || input.prompt.trim().length === 0} // Disable if streaming or input is empty/whitespace
+        disabled={
+          isStreaming || isProcessing || input.prompt.trim().length === 0
+        } // Disable if streaming or input is empty/whitespace
         // Note: The actual form submission is handled by the parent form's onSubmit
         // This button is type="submit" by default, triggering the form handler.
       />
