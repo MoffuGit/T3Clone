@@ -187,8 +187,7 @@ export const streamChat = httpAction(async (ctx, request) => {
           // Wait for sources if search is enabled.
           const sources = await result.sources;
           if (sources && sources.length > 0) {
-            await appendAndAccumulate("\n");
-            await appendAndAccumulate("**Sources**");
+            await appendAndAccumulate("\n **Sources**");
             for (const source of sources) {
               await appendAndAccumulate(`\n- [${source.title}](${source.url})`); // Unordered list item with a link
             }
