@@ -86,21 +86,21 @@ export function UserKeysModal() {
           <APIKeyField
             provider="google"
             label="Google API key"
-            models={PROVIDERS_MODELS["GOOGLE"]}
+            models={PROVIDERS_MODELS.GOOGLE}
             register={register}
             error={errors.google}
           />
           <APIKeyField
             provider="openai"
             label="OpenAi API key"
-            models={PROVIDERS_MODELS["OPENAI"]}
+            models={PROVIDERS_MODELS.OPENAI}
             register={register}
             error={errors.openai}
           />
           <APIKeyField
             provider="openrouter"
             label="OpenRouter API key"
-            models={PROVIDERS_MODELS["OPENROUTER"]}
+            models={PROVIDERS_MODELS.OPENROUTER}
             register={register}
             error={errors.openrouter}
           />

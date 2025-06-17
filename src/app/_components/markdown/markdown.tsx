@@ -20,7 +20,7 @@ const components: Components = {
 };
 
 function CodeBlock({ children, className, ...props }: CodeComponentProps) {
-  const match = /language-(\w+)/.exec(className || "");
+  const match = /language-(\w+)/.exec(className ?? "");
   const { theme } = useTheme();
 
   const codeString = String(children);

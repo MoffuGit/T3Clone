@@ -64,7 +64,7 @@ export function ThreadSearch({
           </CommandGroup>
         )}
 
-        {((threads && threads.length === 0) || !threads) && (
+        {((threads && threads.length === 0) ?? !threads) && (
           <CommandGroup heading="Recent Threads">
             {recentThreads?.map((thread) => (
               <CommandItem

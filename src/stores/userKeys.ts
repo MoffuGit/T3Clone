@@ -37,7 +37,7 @@ export const useAPIKeyStore = create<UserAPIKeysStore>()(
 
       getKey: (provider) => {
         const key = get().keys[provider];
-        return key ? key : null;
+        return key ?? null;
       },
       cleanKeys: () => {
         set(() => ({ keys: {} }));

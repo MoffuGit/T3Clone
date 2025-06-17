@@ -29,14 +29,13 @@ export function ModelMessage({
   const branchThread = useMutation(api.threads.branchThread);
   const router = useRouter();
 
-  const contentToDisplay =
-    message.response !== undefined ? message.response : text;
+  const contentToDisplay = message.response ?? text;
 
   const copyToClipboard = async () => {
     try {
       if (messageRef !== null) {
         const innerText = messageRef.current?.innerText;
-        await navigator.clipboard.writeText(innerText ? innerText : "");
+        await navigator.clipboard.writeText(innerText ?? "");
         setCopied(true);
         toast.success("Copied to clipboard");
         setTimeout(() => {
