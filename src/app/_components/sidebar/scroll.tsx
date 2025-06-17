@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
 import dynamic from "next/dynamic";
+import type { SetStateAction } from "react";
 
 const BreakPoints = dynamic(
   () => import("./breakpoint").then((mode) => mode.BreakPoints),
@@ -20,9 +21,14 @@ const BreakPoints = dynamic(
 export function ScrollSideBar({
   thread,
   scrollTo,
+  copyMessage,
 }: {
   thread: Doc<"threads"> | null | undefined;
   scrollTo: (id: string, options: ScrollIntoViewOptions) => void;
+  copyMessage: (
+    message: string,
+    setCopied: (value: SetStateAction<boolean>) => void,
+  ) => Promise<void>;
 }) {
   return (
     <Sidebar side="right">
@@ -38,7 +44,13 @@ export function ScrollSideBar({
         </SidebarGroup>
       </SidebarHeader>
       <SidebarContent className="pt-0">
-        {thread && <BreakPoints thread={thread._id} scrollTo={scrollTo} />}
+        {thread && (
+          <BreakPoints
+            thread={thread._id}
+            scrollTo={scrollTo}
+            copyMessage={copyMessage}
+          />
+        )}
       </SidebarContent>
       <SidebarFooter></SidebarFooter>
     </Sidebar>

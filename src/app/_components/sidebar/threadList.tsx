@@ -35,9 +35,7 @@ export function ThreadList({
   const isEmpty = threads && threads.length === 0;
 
   if (isLoading) {
-    return (
-      <div className="text-muted-foreground px-4 py-2 text-sm">Loading...</div>
-    );
+    return;
   }
 
   if (group) {

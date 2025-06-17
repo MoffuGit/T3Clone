@@ -5,11 +5,18 @@ import {
 } from "use-stick-to-bottom";
 import { SidebarInset } from "~/components/ui/sidebar";
 
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import { ChatHeader } from "./header";
 import { SideBar } from "./sidebar";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { toast } from "sonner";
 
 interface ThreadContainerProps {
   slug: string | undefined;
@@ -36,25 +43,29 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
     },
     [],
   );
+
   const registerRef = useCallback((id: string, ref: HTMLDivElement | null) => {
     messageRefs.current[id] = ref;
   }, []);
-  const { scrollRef } = stickToBottomInstance;
-  const scrollTo = useCallback(
-    (side: "top" | "bottom", behavior: ScrollBehavior) => {
-      if (scrollRef.current) {
-        switch (side) {
-          case "top":
-            scrollRef.current.scroll({ top: 0, left: 0, behavior });
-            break;
-          case "bottom":
-            scrollRef.current.scroll({
-              top: scrollRef.current.scrollHeight,
-              left: 0,
-              behavior,
-            });
-            break;
+
+  const copyMessage = useCallback(
+    async (
+      message: string,
+      setCopied: (value: SetStateAction<boolean>) => void,
+    ) => {
+      const messageRef = messageRefs.current[message];
+      try {
+        if (messageRef !== null && messageRef !== undefined) {
+          const innerText = messageRef.innerText;
+          setCopied(true);
+          await navigator.clipboard.writeText(innerText ?? "");
+          toast.success("Copied to clipboard");
+          setTimeout(() => {
+            setCopied(false);
+          }, 2000);
         }
+      } catch (error) {
+        console.error("Failed to copy code to clipboard:", error);
       }
     },
     [],
@@ -79,11 +90,11 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
         </div>
       </SidebarInset>
       <SideBar
+        copyMessage={copyMessage}
         toggleSidebar={toggleSidebar}
         thread={thread}
         isOpen={right}
         scrollToMessage={scrollToMessage}
-        scrollToChatArea={scrollTo}
       />
     </>
   );

@@ -1,5 +1,5 @@
 import type { Doc } from "../../../../convex/_generated/dataModel";
-import { useEffect } from "react";
+import { useEffect, type SetStateAction } from "react";
 import { ScrollSideBar } from "~/app/_components/sidebar/scroll";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
@@ -8,7 +8,10 @@ interface SideBarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
   scrollToMessage: (id: string, options: ScrollIntoViewOptions) => void;
-  scrollToChatArea: (side: "top" | "bottom", behavior: ScrollBehavior) => void;
+  copyMessage: (
+    message: string,
+    setCopied: (value: SetStateAction<boolean>) => void,
+  ) => Promise<void>;
 }
 
 export function SideBar({
@@ -16,6 +19,7 @@ export function SideBar({
   isOpen,
   scrollToMessage,
   toggleSidebar,
+  copyMessage,
 }: SideBarProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -30,7 +34,11 @@ export function SideBar({
   }, [toggleSidebar]);
   return (
     <SidebarProvider defaultOpen={false} open={isOpen} className="w-auto">
-      <ScrollSideBar thread={thread} scrollTo={scrollToMessage} />
+      <ScrollSideBar
+        copyMessage={copyMessage}
+        thread={thread}
+        scrollTo={scrollToMessage}
+      />
     </SidebarProvider>
   );
 }
