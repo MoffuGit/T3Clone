@@ -9,6 +9,8 @@ export const AI_MODELS = [
   "Gemini 2.5 Flash",
   "Gemini 2.0 Flash",
   "Gemini 2.0 Flash Exp",
+  "GPT-4o",
+  "GPT-4.1-mini",
 ] as const;
 
 export type AIModel = (typeof AI_MODELS)[number];
@@ -84,6 +86,22 @@ export const MODEL_CONFIGS = {
     fileInput: true,
     searchGrounding: true,
     imageGeneration: true,
+  },
+  "GPT-4o": {
+    modelId: "gpt-4o",
+    provider: "openai",
+    headerKey: "X-OpenAI-API-Key",
+    fileInput: false,
+    searchGrounding: false,
+    imageGeneration: false,
+  },
+  "GPT-4.1-mini": {
+    modelId: "gpt-4.1-mini",
+    provider: "openai",
+    headerKey: "X-OpenAI-API-Key",
+    fileInput: false,
+    searchGrounding: false,
+    imageGeneration: false,
   },
 } as const satisfies Record<AIModel, ModelConfig>;
 

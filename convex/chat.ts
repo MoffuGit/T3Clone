@@ -8,6 +8,7 @@ import { MODEL_CONFIGS, type AIModel } from "~/lib/llmProviders";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { api } from "./_generated/api";
+import { createOpenAI } from "@ai-sdk/openai";
 
 export const streamChat = httpAction(async (ctx, request) => {
   const threadIdHeader = request.headers.get("X-Thread-Id");
@@ -45,6 +46,10 @@ export const streamChat = httpAction(async (ctx, request) => {
         modelConfig.modelId,
         search ? { useSearchGrounding: true } : {},
       );
+      break;
+    case "openai":
+      const openai = createOpenAI({ apiKey: key });
+      model = openai(modelConfig.modelId);
       break;
     default:
       return new Response("Unsupported provider", { status: 400 });
