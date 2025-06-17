@@ -111,6 +111,10 @@ export const branchThread = mutation({
         thread: newThread,
         model: msg.model,
         responseStreamId: msg.responseStreamId,
+        searchGrounding: msg.searchGrounding,
+        attachments: msg.attachments,
+        response: msg.response,
+        imageGeneration: msg.imageGeneration,
       });
 
       if (breakPoint) {
