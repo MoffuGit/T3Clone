@@ -1,5 +1,5 @@
-import { api } from "convex/_generated/api";
-import type { Doc, Id } from "convex/_generated/dataModel";
+import { api } from "../../../convex/_generated/api";
+import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 
 export function UserMessage({ message }: { message: Doc<"messages"> }) {

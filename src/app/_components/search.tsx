@@ -7,8 +7,8 @@ import {
 } from "~/components/ui/command";
 import { useState } from "react";
 import { useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
-import { type Id } from "convex/_generated/dataModel";
+import { api } from "../../../convex/_generated/api";
+import { type Id } from "../../../convex/_generated/dataModel";
 import { useDebounce } from "@uidotdev/usehooks";
 import { GitBranch } from "lucide-react";
 

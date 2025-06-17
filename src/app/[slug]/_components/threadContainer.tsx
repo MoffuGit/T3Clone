@@ -1,4 +1,4 @@
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "../../../../convex/_generated/dataModel";
 import {
   useStickToBottom,
   type StickToBottomInstance,
@@ -9,7 +9,7 @@ import { useCallback, useRef, useState, type ReactNode } from "react";
 import { ChatHeader } from "./header";
 import { SideBar } from "./sidebar";
 import { useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 
 interface ThreadContainerProps {
   slug: String | undefined;

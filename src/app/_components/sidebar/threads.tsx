@@ -19,7 +19,7 @@ import {
 
 import { useTheme } from "next-themes";
 
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Settings } from "lucide-react";
 import { UserKeysModal } from "../keys/keys";
