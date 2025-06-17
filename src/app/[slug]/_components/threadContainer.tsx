@@ -12,7 +12,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
 interface ThreadContainerProps {
-  slug: String | undefined;
+  slug: string | undefined;
   children: (chatProps: {
     thread: Id<"threads"> | undefined | null;
     registerRef: (id: string, ref: HTMLDivElement | null) => void;
@@ -21,12 +21,10 @@ interface ThreadContainerProps {
 }
 
 export function TheadContainer({ children, slug }: ThreadContainerProps) {
-  const thread = slug
-    ? useQuery(api.threads.getThread, {
-        threadId: slug as Id<"threads">,
-      })
-    : null;
-  let [right, set_right] = useState(false);
+  const thread = useQuery(api.threads.getThread, {
+    threadId: slug ? (slug as Id<"threads">) : undefined,
+  });
+  const [right, set_right] = useState(false);
   const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const stickToBottomInstance = useStickToBottom();
   const scrollToMessage = useCallback(
@@ -69,7 +67,10 @@ export function TheadContainer({ children, slug }: ThreadContainerProps) {
     <>
       <SidebarInset>
         <div className="flex h-max max-h-screen flex-col">
-          <ChatHeader thread={thread} toggleSidebar={toggleSidebar} />
+          <ChatHeader
+            thread={slug === undefined ? null : thread}
+            toggleSidebar={toggleSidebar}
+          />
           {children({
             stickToBottomInstance,
             thread: thread?._id,

@@ -25,11 +25,11 @@ interface ChatHeaderProps {
 export function ChatHeader({ thread, toggleSidebar }: ChatHeaderProps) {
   const pinThread = useMutation(api.threads.pinThread);
   const router = useRouter();
-  const handlePinToggle = (e: React.MouseEvent) => {
+  const handlePinToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (thread) {
-      pinThread({
+      await pinThread({
         thread: thread._id,
         pinned: !thread.pinned,
       });

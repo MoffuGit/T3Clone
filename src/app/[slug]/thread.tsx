@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Thread({ slug }: { slug: String | undefined }) {
+export default function Thread({ slug }: { slug: string | undefined }) {
   const router = useRouter();
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

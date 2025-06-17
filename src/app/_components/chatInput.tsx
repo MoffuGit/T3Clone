@@ -156,7 +156,7 @@ export function ChatInput({
         const postUrl = await generateUploadUrl();
         const result = await fetch(postUrl, {
           method: "POST",
-          headers: { "Content-Type": file!.type },
+          headers: { "Content-Type": file.type },
           body: file,
         });
 
@@ -169,7 +169,7 @@ export function ChatInput({
           return null;
         }
 
-        const data = await result.json();
+        const data = (await result.json()) as { storageId: string };
         const storageId = data.storageId;
 
         if (!storageId) {
@@ -247,10 +247,10 @@ export function ChatInput({
   ]);
 
   // Handle Enter key press in the textarea
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit();
+      await handleSubmit();
     }
   };
 
@@ -262,7 +262,7 @@ export function ChatInput({
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            handleSubmit();
+            await handleSubmit();
           }}
           className="border-input pointer-events-auto relative w-full flex-col items-stretch rounded-t-2xl border p-2 backdrop-blur-sm"
         >

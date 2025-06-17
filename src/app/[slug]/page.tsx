@@ -1,6 +1,6 @@
 import Thread from "./thread";
 
-export default async function ({
+export default async function Page({
   params,
 }: {
   params: Promise<{ slug: string }>;

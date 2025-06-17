@@ -15,9 +15,6 @@ export function ChatWindow({
   registerRef: (id: string, ref: HTMLDivElement | null) => void;
   stickToBottomInstance: StickToBottomInstance;
 }) {
-  if (thread === null) {
-    return;
-  }
   const [isStreaming, setIsStreaming] = useState(false);
   const { user } = useUser();
 
