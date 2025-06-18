@@ -37,9 +37,9 @@ function MessageAttachments({
   return (
     <div className="mt-2 flex w-max max-w-2/3 justify-end">
       {messageAttachments.map((attachment) => {
-        if (!attachment || !attachment.url || !attachment.metadata) {
+        if (!attachment?.url || !attachment.metadata) {
           return (
-            <div className="text-sm text-gray-500 italic">
+            <div key={attachment.url} className="text-sm text-gray-500 italic">
               Attachment missing.
             </div>
           );
@@ -73,7 +73,7 @@ function MessageAttachments({
                 Download {fileName}
               </a>
               <span className="text-xs text-gray-500">
-                Type: {attachment.metadata.contentType || "Unknown"}
+                Type: {attachment.metadata.contentType ?? "Unknown"}
                 <br />
                 Size: {formatBytes(attachment.metadata.size)}
               </span>
@@ -88,7 +88,7 @@ function MessageAttachments({
 }
 
 // Helper function to format bytes into human-readable format
-function formatBytes(bytes: number, decimals: number = 2): string {
+function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return "0 Bytes";
 
   const k = 1024;

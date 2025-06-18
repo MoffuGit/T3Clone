@@ -23,7 +23,7 @@ export default function Thread({ slug }: { slug: string | undefined }) {
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [router]);
   return (
     <Authenticated>
       <TheadContainer slug={slug}>

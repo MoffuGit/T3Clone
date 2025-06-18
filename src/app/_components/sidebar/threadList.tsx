@@ -87,16 +87,16 @@ export function ThreadActions({ thread }: ThreadActionsProps) {
   const deleteThread = useMutation(api.threads.deleteThread);
   const pinThread = useMutation(api.threads.pinThread);
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    deleteThread({ threadId: thread._id });
+    await deleteThread({ threadId: thread._id });
   };
 
-  const handlePinToggle = (e: React.MouseEvent) => {
+  const handlePinToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent Link's onClick from firing
-    pinThread({
+    await pinThread({
       thread: thread._id,
       pinned: !thread.pinned,
     });
@@ -146,20 +146,17 @@ export function GroupedThreads({ threads }: GroupedThreadsProps) {
   }
 
   const todayThreads = threads.filter((thread) =>
-    isToday(thread.lastMessage ? thread.lastMessage : thread._creationTime),
+    isToday(thread.lastMessage ?? thread._creationTime),
   );
   const yesterdayThreads = threads.filter((thread) =>
-    isYesterday(thread.lastMessage ? thread.lastMessage : thread._creationTime),
+    isYesterday(thread.lastMessage ?? thread._creationTime),
   );
   const sevenDaysAgo = subDays(new Date(), 7);
   const olderThreads = threads.filter((thread) => {
-    return isWithinInterval(
-      thread.lastMessage ? thread.lastMessage : thread._creationTime,
-      {
-        start: sevenDaysAgo,
-        end: subDays(new Date(), 2),
-      },
-    );
+    return isWithinInterval(thread.lastMessage ?? thread._creationTime, {
+      start: sevenDaysAgo,
+      end: subDays(new Date(), 2),
+    });
   });
 
   const olderThanSevenDays = threads.filter((thread) => {

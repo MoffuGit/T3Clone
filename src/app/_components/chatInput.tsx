@@ -233,23 +233,25 @@ export function ChatInput({
       router.push(`/${threadId}`);
     }
   }, [
-    isProcessing,
-    input,
+    input.prompt,
     isStreaming,
+    isProcessing,
+    thread,
     selectedModel,
+    selectedFiles,
+    sendMessage,
+    searchGrounding,
+    imageGeneration,
     resetInput,
+    addDrivenId,
     adjustHeight,
     setIsStreaming,
-    setIsProcessing,
-    thread,
+    scrollToBottom,
     createNewThread,
-    sendMessage,
-    createBreakPoint,
-    addDrivenId,
-    router,
-    searchGrounding,
-    selectedFiles,
+    generateUploadUrl,
     addAttachments,
+    createBreakPoint,
+    router,
   ]);
 
   // Handle Enter key press in the textarea

@@ -32,7 +32,14 @@ export default function MessageItem({
       "X-Thread-Id": message.thread,
       [config.headerKey]: apiKey,
     }),
-    [message.model, message.thread, config.headerKey, apiKey],
+    [
+      message.searchGrounding,
+      message.imageGeneration,
+      message.model,
+      message.thread,
+      config.headerKey,
+      apiKey,
+    ],
   );
 
   const { removeDrivenId, drivenIds } = useStreamingStore();

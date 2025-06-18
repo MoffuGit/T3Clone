@@ -21,6 +21,7 @@ export function Messages({
 }: MessagesProps) {
   const messages = useQuery(api.messages.listMessages, { thread });
 
+  const { scrollRef, contentRef } = stickToBottomInstance;
   const renderMessages = useCallback(() => {
     if (!messages) {
       return null;
@@ -42,8 +43,7 @@ export function Messages({
         ))}
       </div>
     );
-  }, [messages, registerRef, setIsStreaming]);
-  const { scrollRef, contentRef } = stickToBottomInstance;
+  }, [contentRef, messages, registerRef, setIsStreaming]);
 
   return (
     <div
